@@ -16,6 +16,13 @@ const Header = () => {
         </div>
         <div className="flex items-center">
         <div className="relative m-1">
+          <Link to='/cartelera'>
+            <button className='bg-purple-500 p-3 border-2 border-purple-600'>
+              <p className='text-purple-950 font-bold font-sans'>Cartelera</p>
+            </button>
+          </Link>
+          </div>
+        <div className="relative m-1">
           <Link to='/favoritos'>
             <button className='bg-purple-500 p-3 border-2 border-purple-600'>
               <p className='text-purple-950 font-bold font-sans'>Favoritos</p>
