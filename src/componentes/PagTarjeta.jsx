@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { addToFavorites } from '../services/filmsSlice';
 import Header from './Header';
+import { agregarEntradas } from '../services/entradasSlice';
 
 const PagTarjeta = () => {
   const [pelicula, setPelicula] = useState(null);
@@ -9,7 +12,9 @@ const PagTarjeta = () => {
   const [selectedButton, setSelectedButton] = useState(null);
   const [entradas, setEntradas] = useState(1);
   const [precioTotal, setPrecioTotal] = useState(7.0);
+  const [nombrePeli, setNombrePeli] = useState('');
   const { id } = useParams();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const obtenerDetallesPelicula = async () => {
@@ -28,6 +33,7 @@ const PagTarjeta = () => {
         }
 
         setPelicula(data);
+        setNombrePeli(data.Title);
 
         // Obtener enlace al trailer de YouTube basado en el título de la película
         const trailerLink = await obtenerEnlaceTrailer(data.Title);
@@ -39,6 +45,11 @@ const PagTarjeta = () => {
 
     obtenerDetallesPelicula();
   }, [id]);
+
+  useEffect(() => {
+    // Recalcular el precio total cuando cambie la cantidad de entradas
+    setPrecioTotal(entradas * 7.0);
+  }, [entradas]);
 
   const obtenerEnlaceTrailer = async (titulo) => {
     try {
@@ -58,15 +69,22 @@ const PagTarjeta = () => {
   };
 
   const handleButtonClick = (buttonType) => {
-    setModalVisible(true);
-    setSelectedButton(buttonType);
+    if (buttonType === 'star') {
+      // Añadir la película actual como favorita
+      dispatch(addToFavorites(pelicula));
+      // Mostrar el modal con el mensaje de película añadida a favoritos
+      setSelectedButton('star');
+      setModalVisible(true);
+    } else if (buttonType === 'ticket') {
+      // Mostrar el modal de compra de entradas
+      setSelectedButton('ticket');
+      setModalVisible(true);
+    }
   };
-  
 
   const handleEntradasChange = (event) => {
     const cantidadEntradas = parseInt(event.target.value, 10);
     setEntradas(cantidadEntradas);
-    setPrecioTotal(cantidadEntradas * 7.0);
   };
 
   const closeModal = () => {
@@ -76,44 +94,60 @@ const PagTarjeta = () => {
     setPrecioTotal(7.0);
   };
 
+  const comprarEntradas = () => {
+    const entradasCompradas = {
+      peliculaId: id,
+      title: nombrePeli,
+      cantidad: entradas,
+      precioTotal: precioTotal
+    };
+    console.log(entradasCompradas); // Agreguemos un console.log aquí para verificar la estructura
+    // Actualizar el estado de entradas y precio total
+    setModalVisible(false); // Cerrar el modal antes de actualizar el estado
+    // Dispatch para agregar las entradas al estado global
+    dispatch(agregarEntradas(entradasCompradas));
+  };
+  
+  
+
   return (
     <div className="bg-black text-white p-6">
-    <Header />
-    <div className="flex flex-col md:flex-row my-20">
-      <div className="md:w-1/2 mr-4">
-        <h1 className="text-5xl font-bold mb-4 text-purple-500 flex justify-center">{pelicula?.Title}</h1>
+      <Header />
+      <div className="flex flex-col md:flex-row my-20">
+        <div className="md:w-1/2 mr-4">
+          <h1 className="text-5xl font-bold mb-4 text-purple-500 flex justify-center">{pelicula?.Title}</h1>
 
-        <div className='my-10 flex flex-grow flex-col justify-center w-96 m-auto'>
-          <p className="text-lg mb-2">
-            <span className="font-bold text-purple-500">Año:</span> {pelicula?.Year}
-          </p>
-          <p className="text-lg mb-2">
-            <span className="font-bold text-purple-500">Fecha de Salida:</span> {pelicula?.Released}
-          </p>
-          <p className="text-lg mb-2">
-            <span className="font-bold text-purple-500">Duración:</span> {pelicula?.Runtime}
-          </p>
-          <p className="text-lg mb-2">
-            <span className="font-bold text-purple-500">Género:</span> {pelicula?.Genre}
-          </p>
-          <p className="text-lg mb-2">
-            <span className="font-bold text-purple-500">Director:</span> {pelicula?.Director}
-          </p>
-          <p className="text-lg mb-2">
-            <span className="font-bold text-purple-500">Actores:</span> {pelicula?.Actors}
-          </p>
-          <p className="text-lg mb-2">
-            <span className="font-bold text-purple-500">Premios:</span> {pelicula?.Awards}
-          </p>
-          <p className="text-lg mb-2">
-            <span className="font-bold text-purple-500">IMDb Rating:</span> {pelicula?.imdbRating}
-          </p>
+          <div className='my-10 flex flex-grow flex-col justify-center w-96 m-auto'>
+            <p className="text-lg mb-2">
+              <span className="font-bold text-purple-500">Año:</span> {pelicula?.Year}
+            </p>
+            <p className="text-lg mb-2">
+              <span className="font-bold text-purple-500">Fecha de Salida:</span> {pelicula?.Released}
+            </p>
+            <p className="text-lg mb-2">
+              <span className="font-bold text-purple-500">Duración:</span> {pelicula?.Runtime}
+            </p>
+            <p className="text-lg mb-2">
+              <span className="font-bold text-purple-500">Género:</span> {pelicula?.Genre}
+            </p>
+            <p className="text-lg mb-2">
+              <span className="font-bold text-purple-500">Director:</span> {pelicula?.Director}
+            </p>
+            <p className="text-lg mb-2">
+              <span className="font-bold text-purple-500">Actores:</span> {pelicula?.Actors}
+            </p>
+            <p className="text-lg mb-2">
+              <span className="font-bold text-purple-500">Premios:</span> {pelicula?.Awards}
+            </p>
+            <p className="text-lg mb-2">
+              <span className="font-bold text-purple-500">IMDb Rating:</span> {pelicula?.imdbRating}
+            </p>
+          </div>
+        </div>
+        <div className="md:w-1/4 h-auto">
+          <img src={pelicula?.Poster} alt={pelicula?.Title} className="w-full h-auto" />
         </div>
       </div>
-      <div className="md:w-1/4 h-auto">
-        <img src={pelicula?.Poster} alt={pelicula?.Title} className="w-full h-auto" />
-      </div>
-    </div>
 
       {/* Botones de estrella y ticket */}
       <div className="flex items-center justify-center space-x-4 mb-16">
@@ -125,43 +159,39 @@ const PagTarjeta = () => {
         </button>
       </div>
 
+      {/* Modal */}
       {modalVisible && (
-  <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-75">
-    <div className="bg-white p-8 rounded-md text-black">
-      {selectedButton === 'star' && (
-        <p className="text-lg font-semibold mb-4">
-          {pelicula?.Title ? `${pelicula.Title} añadida a Favoritos!` : 'Película añadida a Favoritos!'}
-        </p>
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-75">
+          <div className="bg-white p-8 rounded-md text-black">
+            {selectedButton === 'star' ? (
+              <p className="text-lg font-semibold mb-4">
+                {pelicula?.Title ? `${pelicula.Title} añadida a Favoritos!` : 'Película añadida a Favoritos!'}
+              </p>
+            ) : (
+              <>
+                <p className="text-lg font-semibold mb-4">Compra de entradas para {pelicula?.Title}</p>
+                <label htmlFor="cantidadEntradas" className="mr-2">Cantidad de Entradas:</label>
+                <select
+                  id="cantidadEntradas"
+                  value={entradas}
+                  onChange={handleEntradasChange}
+                  className="p-2 border border-gray-400 rounded"
+                >
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((cantidad) => (
+                    <option key={cantidad} value={cantidad}>{cantidad}</option>
+                  ))}
+                </select>
+                <button className="bg-purple-500 text-white p-2 rounded" onClick={comprarEntradas}>
+                  Comprar
+                </button>
+              </>
+            )}
+            <button className="bg-purple-500 text-white p-2 rounded" onClick={closeModal}>
+              Cerrar
+            </button>
+          </div>
+        </div>
       )}
-      {selectedButton === 'ticket' && (
-        <>
-          <p className="text-lg font-semibold mb-2">
-            {pelicula?.Title ? `Compra de Entradas - ${pelicula.Title}` : 'Compra de Entradas'}
-          </p>
-          <label className="block mb-2">Cantidad de entradas:</label>
-          <select value={entradas} onChange={handleEntradasChange} className="mb-4">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((cantidad) => (
-              <option key={cantidad} value={cantidad}>
-                {cantidad}
-              </option>
-            ))}
-          </select>
-          <p className="mb-2">Precio Total: ${precioTotal.toFixed(2)}</p>
-          
-          {/* Botón "Comprar" */}
-          <button className="bg-purple-500 text-white p-2 rounded mx-10" onClick={() => closeModal()}>
-            Comprar
-          </button>
-        </>
-      )}
-      <button className="bg-purple-500 text-white p-2 rounded" onClick={closeModal}>
-        Cerrar
-      </button>
-    </div>
-  </div>
-)}
-
-
 
       {/* Trailer */}
       <div className='text-center'>
