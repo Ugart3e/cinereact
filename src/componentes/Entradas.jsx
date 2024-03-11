@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Header from './Header';
+import { observer } from 'mobx-react-lite';
+import ticketStore from '../services/entradasStore';
 
 const Entradas = () => {
-  const { entradas } = useSelector(state => state.entradas);
+  const entradas = ticketStore.ticketState.entradas;
   return (
     <div>
       <Header />
@@ -24,4 +26,4 @@ const Entradas = () => {
   );
 };
 
-export default Entradas;
+export default observer(Entradas);

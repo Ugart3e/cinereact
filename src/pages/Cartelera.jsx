@@ -1,23 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import Tarjeta from '../componentes/Tarjeta';
 import Header from '../componentes/Header';
 import { useDispatch, useSelector } from 'react-redux';
-import { obtenerPeliculas } from '../services/filmsThunk';
+import { observer } from 'mobx-react';
+import filmsStore from '../services/store';
 
 function Cartelera() {
   const [busqueda, setBusqueda] = useState('');
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { films } = useSelector(state => state.films);
+  const films = filmsStore.filmsState.films;
   const [keywo, setKeywo] = useState('');
 
   useEffect(() => {
     if (busqueda.length >= 3) {
-      dispatch(obtenerPeliculas(busqueda));
-    } else {
-      dispatch(obtenerPeliculas("war"));
+      filmsStore.buscarPelis(busqueda);
     }
   }, [busqueda]);
 
@@ -61,4 +58,4 @@ function Cartelera() {
   );
 }
 
-export default Cartelera;
+export default observer(Cartelera);

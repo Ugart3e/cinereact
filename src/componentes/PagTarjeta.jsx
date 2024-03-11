@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { addToFavorites } from '../services/filmsSlice';
 import Header from './Header';
-import { agregarEntradas } from '../services/entradasSlice';
+import filmsStore from '../services/store';
 
 const PagTarjeta = () => {
   const [pelicula, setPelicula] = useState(null);
@@ -14,7 +12,6 @@ const PagTarjeta = () => {
   const [precioTotal, setPrecioTotal] = useState(7.0);
   const [nombrePeli, setNombrePeli] = useState('');
   const { id } = useParams();
-  const dispatch = useDispatch();
 
   useEffect(() => {
     const obtenerDetallesPelicula = async () => {
@@ -71,12 +68,11 @@ const PagTarjeta = () => {
   const handleButtonClick = (buttonType) => {
     if (buttonType === 'star') {
       // Añadir la película actual como favorita
-      dispatch(addToFavorites(pelicula));
+      filmsStore.setFavorite(pelicula);
       // Mostrar el modal con el mensaje de película añadida a favoritos
       setSelectedButton('star');
       setModalVisible(true);
     } else if (buttonType === 'ticket') {
-      // Mostrar el modal de compra de entradas
       setSelectedButton('ticket');
       setModalVisible(true);
     }
