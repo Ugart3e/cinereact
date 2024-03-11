@@ -7,9 +7,9 @@ import ticketStore from '../services/entradasStore';
 const Entradas = () => {
   const entradas = ticketStore.ticketState.entradas;
   return (
-    <div>
+    <div className='pb-96 bg-black'>
       <Header />
-      <div className="bg-black text-white p-6">
+      <div className="bg-black text-white p-6 ">
         <h1 className="text-3xl font-bold mb-4 text-purple-500">Entradas Compradas</h1>
         <div className="flex flex-col">
           {entradas?.map((entrada, index) => (
