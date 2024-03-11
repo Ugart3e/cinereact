@@ -10,9 +10,9 @@ const Favoritos = () => {
   const favorites = filmsStore.filmsState.favorites;
 
   return (
-    <div className='bg-black h-full'>
+    <div className='bg-black pb-96'>
       <Header />
-      <div className="container mx-auto py-8 bg-black">
+      <div className="container mx-auto py-8 bg-black pb-60">
         <h1 className="text-2xl text-white font-bold mb-4">Películas Favoritas</h1>
         <div className="flex gap-2">
           {favorites.length > 0 ? (
